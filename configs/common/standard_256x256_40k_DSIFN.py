@@ -3,26 +3,17 @@ _base_ = '../_base_/default_runtime.py'
 dataset_type = 'DSIFN_Dataset'
 data_root = 'data/DSIFN'
 
-crop_size = (256, 256)
+crop_size = (512, 512)
 train_pipeline = [
     dict(type='MultiImgLoadImageFromFile'),
     dict(type='MultiImgLoadAnnotations'),
-    dict(type='MultiImgRandomRotate', prob=0.5, degree=180),
     dict(type='MultiImgRandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
-    dict(type='MultiImgRandomFlip', prob=0.5, direction='horizontal'),
-    dict(type='MultiImgRandomFlip', prob=0.5, direction='vertical'),
-    # dict(type='MultiImgExchangeTime', prob=0.5),
-    dict(
-        type='MultiImgPhotoMetricDistortion',
-        brightness_delta=10,
-        contrast_range=(0.8, 1.2),
-        saturation_range=(0.8, 1.2),
-        hue_delta=10),
+    dict(type='MultiImgRandomFlip', prob=0.5),
     dict(type='MultiImgPackSegInputs')
 ]
 test_pipeline = [
     dict(type='MultiImgLoadImageFromFile'),
-    dict(type='MultiImgResize', scale=(1024, 1024), keep_ratio=True),
+    dict(type='MultiImgResize', scale=(512, 512), keep_ratio=True),
     # add loading annotation after ``Resize`` because ground truth
     # does not need to do resize data transform
     dict(type='MultiImgLoadAnnotations'),
@@ -54,10 +45,11 @@ train_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
+        seg_map_suffix='.png',
         data_prefix=dict(
-            seg_map_path='train/mask',
             img_path_from='train/t1',
-            img_path_to='train/t2'),
+            img_path_to='train/t2',
+            seg_map_path='train/mask'),
         pipeline=train_pipeline))
 val_dataloader = dict(
     batch_size=1,
@@ -67,10 +59,11 @@ val_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
+        seg_map_suffix='.png',
         data_prefix=dict(
-            seg_map_path='val/mask',
             img_path_from='val/t1',
-            img_path_to='val/t2'),
+            img_path_to='val/t2',
+            seg_map_path='val/mask'),
         pipeline=test_pipeline))
 test_dataloader = dict(
     batch_size=1,
@@ -80,10 +73,11 @@ test_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
+        seg_map_suffix='.tif',
         data_prefix=dict(
-            seg_map_path='test/mask',
             img_path_from='test/t1',
-            img_path_to='test/t2'),
+            img_path_to='test/t2',
+            seg_map_path='test/mask'),
         pipeline=test_pipeline))
 
 val_evaluator = dict(type='mmseg.IoUMetric', iou_metrics=['mFscore', 'mIoU'])
@@ -120,4 +114,4 @@ default_hooks = dict(
                     save_best='mIoU'),
     sampler_seed=dict(type='DistSamplerSeedHook'),
     visualization=dict(type='CDVisualizationHook', interval=1, 
-                       img_shape=(1024, 1024, 3)))
+                       img_shape=(512, 512, 3)))
