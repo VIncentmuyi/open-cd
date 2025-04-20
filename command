@@ -11,3 +11,6 @@ CUDA_VISIBLE_DEVICES=1  python tools/test.py configs/lightcdnet/lightcdnet_s_512
 
 CUDA_VISIBLE_DEVICES=1 python tools/train.py configs/changer/changer_ex_s101_512x512_40k_Mine.py --work-dir ./changer_r18_Mine_workdir
 CUDA_VISIBLE_DEVICES=1  python tools/test.py configs/changer/changer_ex_s101_512x512_40k_Mine.py  ./changer_r18_Mine_workdir/best_mIoU_iter_30000.pth --show-dir tmp_infer_Mine
+
+
+CUDA_VISIBLE_DEVICES=1 python tools/train.py configs/changer/changer_ex_r18_512x512_40k_levircd.py --work-dir ./changer_r18_Mine_workdir
